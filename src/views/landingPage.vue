@@ -53,7 +53,7 @@ const stats = [
         <span class="fw-bold">PayrollAO</span>
       </a>
       <div class="ms-auto">
-        <router-link class="btn btn-primary px-4" to="/login">
+        <router-link class="btn btn-primary px-4" :to="{ name: 'login' }">
           Entrar
         </router-link>
       </div>

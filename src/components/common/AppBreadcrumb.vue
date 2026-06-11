@@ -21,7 +21,7 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 
 const labelMap = {
-  '':           'Dashboard',
+  '':           'Paínel Administrativo',
   employees:    'Funcionários',
   create:       'Novo',
   departments:  'Departamentos',

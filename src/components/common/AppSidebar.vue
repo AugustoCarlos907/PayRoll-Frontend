@@ -7,9 +7,10 @@
     </div>
 
     <ul class="nav flex-column gap-1 flex-grow-1">
-      <li v-for="item in menuItems" >
+      <li v-for="item in menuItems" :key="item.name">
 
         <template v-if="item.children">
+          
           <button
             class="nav-link w-100 text-start d-flex align-items-center gap-2 border-0 bg-transparent"
             @click="toggleGroup(item.name)"
@@ -18,25 +19,27 @@
             <span class="label flex-grow-1">{{ item.label }}</span>
             <i class="bi label" :class="openGroups.includes(item.name) ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
           </button>
+
           <ul v-show="openGroups.includes(item.name)" class="nav flex-column ps-3 gap-1 mt-1">
             <li v-for="child in item.children" :key="child.name">
               <button
                 class="nav-link w-100 text-start d-flex align-items-center gap-2 border-0 bg-transparent"
                 :class="{ active: uiStore.currentPage === child.name }"
-                @click="uiStore.navigate(child.name)"
+                @click="navigateTo(child.name)"
               >
                 <i :class="['bi', child.icon, 'fs-6']"></i>
                 <span class="label">{{ child.label }}</span>
               </button>
             </li>
           </ul>
+
         </template>
 
         <button
           v-else
           class="nav-link w-100 text-start d-flex align-items-center gap-2 border-0 bg-transparent"
           :class="{ active: uiStore.currentPage === item.name }"
-          @click="uiStore.navigate(item.name)"
+          @click="navigateTo(item.name)"
         >
           <i :class="['bi', item.icon, 'fs-6']"></i>
           <span class="label">{{ item.label }}</span>
@@ -57,19 +60,42 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useUiStore } from '@/stores/ui'
 
 const uiStore = useUiStore()
+const router = useRouter()
+const route = useRoute()
 const openGroups = ref([])
+
+watch(
+  () => route.name,
+  (name) => {
+    if (name) uiStore.currentPage = name.toString()
+  },
+  { immediate: true }
+)
 
 function toggleGroup(name) {
   const i = openGroups.value.indexOf(name)
   i === -1 ? openGroups.value.push(name) : openGroups.value.splice(i, 1)
 }
 
+function navigateTo(name) {
+  if (route.name === name) return
+  router.push({ name })
+  .catch((err) => {
+    if (err && !/Avoided redundant navigation/.test(err.message)) {
+      console.error(err)
+    }
+  })
+}
+
 const menuItems = [
-  { name: 'dashboard',  label: 'Dashboard',     icon: 'bi-speedometer2' },
+
+  { name: 'dashboard',  label: 'Paínel Administrativo',     icon: 'bi-speedometer2' },
+
   {
     name: 'people', label: 'Colaboradores', icon: 'bi-people',
     children: [
@@ -78,12 +104,13 @@ const menuItems = [
       { name: 'positions',   label: 'Cargos',        icon: 'bi-briefcase' },
     ]
   },
+
   { name: 'attendance', label: 'Presenças',      icon: 'bi-calendar-check' },
   { name: 'payroll',    label: 'Folha Salarial', icon: 'bi-file-earmark-text' },
   { name: 'benefits',   label: 'Benefícios',     icon: 'bi-gift' },
   { name: 'deductions', label: 'Descontos',      icon: 'bi-dash-circle' },
   { name: 'payments',   label: 'Pagamentos',     icon: 'bi-credit-card' },
-  { name: 'reports',    label: 'Relatórios',     icon: 'bi-bar-chart' },
-  { name: 'users',      label: 'Utilizadores',   icon: 'bi-shield-lock' },
+  // { name: 'reports',    label: 'Relatórios',     icon: 'bi-bar-chart' },
+  // { name: 'users',      label: 'Utilizadores',   icon: 'bi-shield-lock' },
 ]
 </script>

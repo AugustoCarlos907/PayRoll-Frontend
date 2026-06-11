@@ -3,6 +3,7 @@ import AppSidebar    from '@/components/common/AppSidebar.vue'
 import AppHeader     from '@/components/common/AppHeader.vue'
 import AppBreadcrumb from '@/components/common/AppBreadcrumb.vue'
 import AppFooter     from '@/components/common/AppFooter.vue'
+
 </script>
 
 
@@ -13,6 +14,7 @@ import AppFooter     from '@/components/common/AppFooter.vue'
       <AppHeader />
       <main class="p-4 flex-grow-1">
         <AppBreadcrumb />
+        <router-view />
       </main>
       <AppFooter />
     </div>
