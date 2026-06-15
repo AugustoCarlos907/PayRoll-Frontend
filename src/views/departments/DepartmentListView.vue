@@ -1,18 +1,31 @@
 <script setup>
-import { ref, computed } from 'vue'
+import DepartmentService from '@/services/DepartmentService'
+import { ref, computed  , onMounted} from 'vue'
 
 const q = ref('')
-const departments = ref([
-    { id: 1, name: 'Recursos Humanos' },
-    { id: 2, name: 'Finanças' },
-    { id: 3, name: 'Tecnologia' }
-])
 
-const filtered = computed(() => {
-    const s = q.value.trim().toLowerCase()
-    if (!s) return departments.value
-    return departments.value.filter(d => d.name.toLowerCase().includes(s) || String(d.id).includes(s))
+onMounted(() => {
+    fetchDepartments()
 })
+
+async function fetchDepartments() {
+    loading.value = true
+    error.value   = ''
+    try {
+        const response = await DepartmentService.getAll()
+        departments.value = response.data.data
+        console.log(response)
+        
+    } catch (error) {
+        error.value = 'Erro ao carregar departamentos'
+    }finally {
+        loading.value = false
+    }
+}
+
+const departments = ref([])
+const loading     = ref(false)
+const error       = ref('')
 
 function remove(id) {
     if (!confirm('Remover departamento?')) return
@@ -37,13 +50,14 @@ function remove(id) {
                         <tr>
                             <th>#</th>
                             <th>Nome</th>
-                            <th></th>
+                            <th>Descrição</th>
                         </tr>
                     </thead>
                     <transition-group tag="tbody" name="list">
-                        <tr v-for="dep in filtered" :key="dep.id">
+                        <tr v-for="dep in departments" :key="dep.id">
                             <td>{{ dep.id }}</td>
-                            <td>{{ dep.name }}</td>
+                            <td>{{ dep.name }} - <b> ({{ dep.code }})</b></td>
+                            <td>{{ dep.description }}</td>
                             <td class="text-end">
                                 <button class="btn btn-sm btn-outline-primary me-2">Ver</button>
                                 <button class="btn btn-sm btn-outline-secondary me-2">Editar</button>
